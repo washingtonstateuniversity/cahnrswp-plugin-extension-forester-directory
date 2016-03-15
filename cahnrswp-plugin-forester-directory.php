@@ -21,6 +21,9 @@ class CAHNRSWP_Forester_Directory {
 	//@var object $services instance of CAHNRSWP_Forester_Directory_County
 	public $counties;
 	
+	//@var object $shortcodes instance of CAHNRSWP_Forester_Directory_Shortcodes
+	public $shortcodes;
+	
 	/**
 	 * Get the current instance or set it an return
 	 * @return object current instance of CAHNRSWP_Forester_Directory
@@ -61,6 +64,12 @@ class CAHNRSWP_Forester_Directory {
 		  $this->consultant = new CAHNRSWP_Forester_Directory_Consultant( $this->services , $this->counties );
 		  
 		  $this->consultant->init();
+		  
+		  require_once 'classes/cahnrswp-forester-directory-shortcodes.php';
+		  
+		  $this->shortcodes = new CAHNRSWP_Forester_Directory_Shortcodes( $this->consultant , $this->counties , $this->services );
+		  
+		  $this->shortcodes->init();
 		  
 	  } // end init_plugin
 	

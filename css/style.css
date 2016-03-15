@@ -1,0 +1,144 @@
+/* CSS Document */
+
+#cwpdir-search {
+	background: #ddd;
+	border: 1px solid #ccc;
+	padding: 0.5rem 0;
+	margin-bottom: 1.5rem;
+}
+
+#cwpdir-search div{
+	margin: 0 0.5rem;
+}
+
+#cwpdir-search input{
+	width: 100%;
+	line-height: 40px;
+	height: 40px;
+	text-indent: 1rem;
+	font-size: 1.1rem;
+}
+
+#cwpdir-filter {
+	padding-bottom: 1rem;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 1rem;
+}
+
+#cwpdir-filter .filter {
+	width: 23%;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0 1%;
+}
+
+#cwpdir-filter .filter select{
+	width: 100%;
+}
+
+#cwpdir-filter .filter label{
+	display: block;
+}
+
+.directory-card {
+	display: inline-block;
+	width: 23%;
+	margin: 0 1% 2%;
+	padding: 0 0 60px;
+	background: #fff;
+	vertical-align: top;
+	min-height: 160px;
+	position: relative;
+	word-wrap: break-word;
+}
+
+.directory-card div {
+	margin: 0.5rem 1rem;
+}
+
+.directory-meta {
+	display: none;
+}
+
+.directory-card .directory-profile-button {
+	position: absolute;
+	bottom: 1rem;
+	left:0;
+	right: 0;
+}
+
+.directory-card .directory-profile-button a {
+	display: block;
+	margin: 0 0;
+	background: #981e32;
+	color: #fff;
+	padding: 0.25rem 1rem;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+.directory-card .directory-title {
+	font-weight: bold;
+}
+
+.directory-profile-contact {
+	width: 30%;
+	display: inline-block;
+	vertical-align: top;
+	padding: 1rem 0;
+}
+
+.directory-profile-contact div {
+	margin: 0 1rem;
+}
+
+.directory-profile-content {
+	width: 70%;
+	display: inline-block;
+	vertical-align: top;
+	padding: 1rem 0 2rem;
+}
+
+#cwpdir-lb {
+	position: absolute;
+	width: 100%;
+	margin: 0 auto;
+	z-index: 99999;
+	top: 100px;
+	display: none;
+}
+
+#cwpdir-lb .cwpdir-close {
+	display: block;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	background: #981e32;
+	color: #fff;
+	text-align: center;
+	text-decoration: none;
+	text-transform: uppercase;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#cwpdir-lb section {
+	max-width: 800px;
+	margin: 0 auto;
+	background-color: #fff;
+	display: block;
+}
+
+#cwpdir-lb-bg {
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top:0;
+	left:0;
+	background-color: rgba( 0 , 0, 0 , 0.5 );
+	z-index: 99998;
+	display: none;
+}
+
