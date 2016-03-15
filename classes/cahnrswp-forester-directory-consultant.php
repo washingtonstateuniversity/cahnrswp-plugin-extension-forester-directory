@@ -9,6 +9,12 @@ require_once 'cahnrswp-forester-directory-post-type.php';
  
 class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory_Post_Type  {
 	
+	// @var object $services instance of services taxonomy object
+	protected $services;
+	
+	// @var object $counties Instance of county taxonomy
+	protected $counties;
+	
 	// @var string $slug Post type slug
 	protected $slug = 'consultant';
 	
@@ -63,7 +69,7 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 	protected $hard_taxonomies = array( 'service' , 'county' );
 	
 	// @var array $services Services consultants provide
-	protected $services = array(
+	/*protected $services = array(
 			'slash-disposal'                  => 'Brush/slash disposal',
 			'gis'                             => 'GIS mapping services',
 			'forest-management-advice'        => 'Forest management advice',
@@ -87,9 +93,11 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 			'vegetation-control-mechanical'   => 'Vegetation control/release – mechanical', 
 			'wildlife-enhancement'            => 'Wildlife enhancement', 
 			'wildlife-damage'                 => 'Wildlife damage control', 
-		);
+		);*/
+
 	
-	protected $counties_served = array(
+	
+	/*_served = array(
 		'clallam'      => 'Clallam',
 		'clark'        => 'Clark',
 		'cowlitz'      => 'Cowlitz',
@@ -129,13 +137,31 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 		'walla walla'  => 'Walla Walla',
 		'whitman'      => 'Whitman',
 		'yakima'       => 'Yakima',
-	);
+	);*/
+	
+	/**
+	 * Set up object
+	 * @param object $services instance of services taxonomy object
+	 */
+	public function __construct( $services , $counties ){
+		
+		$this->services = $services;
+		
+		$this->counties = $counties;
+		
+	} // end __construct
 		
 	/**
 	 * Get method for services
-	 * @return array
+	 * @return object
 	 */
 	public function get_services(){ return $this->services; }
+	
+	/**
+	 * Get method for counties
+	 * @return object
+	 */
+	public function get_counties(){ return $this->counties; }
 	
 	/**
 	 * Get method for counties serviced
@@ -250,15 +276,19 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 		
 		$services = $this->get_services();
 		
+		$terms = $services->get_terms( $post->ID , true );
+		
 		$html = '<fieldset id="consultant-service-type">';
 			
 			$html .= '<h3 class="consultant-section-title">Services Provided</h3>';
 			
-			foreach( $services as $service_key => $service ){
+			foreach( $services->get_values() as $service_key => $service ){
 				
 				$html .= '<div class="consultant-field checkbox">';
 				
-					$html .= '<input id="service-type-' . $service_key . '" type="checkbox" name="_taxonomy[service][' . $service_key . ']" value="1"/>';
+					$checked = ( in_array( $service_key , $terms ) ) ? ' checked="checked"':'';
+				
+					$html .= '<input id="service-type-' . $service_key . '" type="checkbox" name="_taxonomy[service][]" value="' . $service_key . '"' . $checked . '/>';
 					
 					$html .= '<label for="service-type-' . $service_key . '">' . $service . '</label>';
 				
@@ -288,17 +318,21 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 	 */
 	private function get_service_location_form( $post , $settings ){
 		
-		$counties = $this->get_counties_served();
+		$counties = $this->get_counties();
+		
+		$terms = $counties->get_terms( $post->ID , true );
 		
 		$html = '<fieldset id="consultant-service-location">';
 			
 			$html .= '<h3 class="consultant-section-title">Counties Served</h3>';
 			
-			foreach( $counties as $county_key => $county ){
+			foreach( $counties->get_values() as $county_key => $county ){
+				
+				$checked = ( in_array( $county_key , $terms ) ) ? ' checked="checked"':'';
 				
 				$html .= '<div class="consultant-field checkbox">';
 				
-					$html .= '<input id="service-type-' . $county_key . '" type="checkbox" name="_taxonomy[county][' . $county_key . ']" value="1"/>';
+					$html .= '<input id="service-type-' . $county_key . '" type="checkbox" name="_taxonomy[county][]" value="' . $county_key . '"' . $checked . '/>';
 					
 					$html .= '<label for="service-type-' . $county_key . '">' . $county . '</label>';
 				
@@ -391,6 +425,36 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 		return $html;
 		
 	} // end get_service_location_form
+	
+	/**
+	 * Save
+	 * @param object $services instance of services taxonomy object
+	 */
+	public function save( $post_id ){
+		
+		if ( ! $this->check_permissions( $post_id ) ) return false;
+		
+		parent::save( $post_id );
+		
+		$taxonomies = array( $this->services->get_slug() );
+		
+		// Delete all terms from post
+		//wp_delete_object_term_relationships( $post_id, $taxonomies );
+		
+		if ( ! empty( $_POST['_taxonomy']['service'] ) ){
+		
+			$this->services->save_post_terms( $post_id , $_POST['_taxonomy']['service'] );
+		
+		} // end if
+		
+		if ( ! empty( $_POST['_taxonomy']['county'] ) ){
+		
+			$this->counties->save_post_terms( $post_id , $_POST['_taxonomy']['county'] );
+		
+		} // end if
+		
+		
+	} // end __construct
 	
 	
 	

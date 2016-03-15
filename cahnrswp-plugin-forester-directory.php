@@ -15,6 +15,12 @@ class CAHNRSWP_Forester_Directory {
 	//@var object $consultant instance of CAHNRSWP_Forester_Directory_Consultant
 	public $consultant;
 	
+	//@var object $services instance of CAHNRSWP_Forester_Directory_Service
+	public $services;
+	
+	//@var object $services instance of CAHNRSWP_Forester_Directory_County
+	public $counties;
+	
 	/**
 	 * Get the current instance or set it an return
 	 * @return object current instance of CAHNRSWP_Forester_Directory
@@ -38,9 +44,21 @@ class CAHNRSWP_Forester_Directory {
 	  */
 	  public function init_plugin(){
 		  
+		  require_once 'classes/cahnrswp-forester-directory-service.php';
+		  
+		  $this->services = new CAHNRSWP_Forester_Directory_Service();
+		  
+		  $this->services->init();
+		  
+		  require_once 'classes/cahnrswp-forester-directory-county.php';
+		  
+		  $this->counties = new CAHNRSWP_Forester_Directory_County();
+		  
+		  $this->counties->init();
+		  
 		  require_once 'classes/cahnrswp-forester-directory-consultant.php';
 		  
-		  $this->consultant = new CAHNRSWP_Forester_Directory_Consultant();
+		  $this->consultant = new CAHNRSWP_Forester_Directory_Consultant( $this->services , $this->counties );
 		  
 		  $this->consultant->init();
 		  

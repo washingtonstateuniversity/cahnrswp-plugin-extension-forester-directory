@@ -209,31 +209,7 @@ abstract class CAHNRSWP_Forester_Directory_Post_Type {
 	 */
 	public function save( $post_id ){
 		
-		// If this is an autosave, our form has not been submitted, so we don't want to do anything.
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-
-			return false;
-
-		} // end if
-
-		// Check the user's permissions.
-		if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {
-
-			if ( ! current_user_can( 'edit_page', $post_id ) ) {
-
-				return false;
-
-			} // end if
-
-		} else {
-
-			if ( ! current_user_can( 'edit_post', $post_id ) ) {
-
-				return false;
-
-			} // end if
-
-		} // end if
+		if ( ! $this->check_permissions( $post_id ) ) return false;
 		
 		$fields = $this->get_fields();
 		
@@ -246,6 +222,43 @@ abstract class CAHNRSWP_Forester_Directory_Post_Type {
 		} // end foreach
 		
 	} // end save
+	
+	/**
+	 * Check user permissions
+	 * @param int $post_id Post ID
+	 * @return bool TRUE if has permissions otherwise FALSE
+	 */
+	protected function check_permissions( $post_id ){
+		
+		// If this is an autosave, our form has not been submitted, so we don't want to do anything.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+
+			return false;
+
+		} // end if
+
+		// Check the user's permissions.
+		if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {
+
+			if ( current_user_can( 'edit_page', $post_id ) ) {
+
+				return true;
+
+			} // end if
+
+		} else {
+
+			if ( current_user_can( 'edit_post', $post_id ) ) {
+
+				return true;
+
+			} // end if
+
+		} // end if
+		
+		return false;
+		
+	}// end check_permissions
 	
 	
 }
