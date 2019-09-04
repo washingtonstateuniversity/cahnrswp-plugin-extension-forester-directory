@@ -60,6 +60,9 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 		'_saf'                   => array('text',''),
 		'_sfl'                   => array('text',''),
 		'_flc'                   => array('text',''),
+		'_tsp'                   => array('text',''),
+		'_tsp_number'            => array('text',''),
+		'_cwms'                  => array('text',''),
 		);
 	
 	// @var bool $do_save Add save action
@@ -68,76 +71,14 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 	// @var bool $taxonomies Taxomomies hard coded in to form
 	protected $hard_taxonomies = array( 'service' , 'county' );
 	
-	// @var array $services Services consultants provide
-	/*protected $services = array(
-			'slash-disposal'                  => 'Brush/slash disposal',
-			'gis'                             => 'GIS mapping services',
-			'forest-management-advice'        => 'Forest management advice',
-			'forest-management-plan-writing'  => 'Forest management plan writing', 
-			'inventory'                       => 'Forest inventory/appraisal/timber cruising', 
-			'practices-permitting'            => 'Forest practices permitting', 
-			'security-consulting'             => 'Forestland security consulting', 
-			'invasive-species-control'        => 'Invasive species identification and control', 
-			'non-timber-products'             => 'Non-timber forest products', 
-			'pre-commercial-thinning'         => 'Pre-commercial thinning', 
-			'prescribed-burning'              => 'Prescribed burning', 
-			'property-surveying'              => 'Property surveying', 
-			'reforestation'                   => 'Reforestation/tree planting', 
-			'riparian-management-alternative' => 'Riparian management/alternative plan applications', 
-			'road-maintenance'                => 'Road maintenance/engineering', 
-			'site-preparation–chemical'       => 'Site preparation – chemical', 
-			'site-preparation–mechanical'     => 'Site preparation – mechanical', 
-			'timber-sale'                     => 'Timber sale management/marketing', 
-			'trail-construction'              => 'Trail/Boardwalk construction', 
-			'vegetation-control–chemical'     => 'Vegetation control/release – chemical', 
-			'vegetation-control-mechanical'   => 'Vegetation control/release – mechanical', 
-			'wildlife-enhancement'            => 'Wildlife enhancement', 
-			'wildlife-damage'                 => 'Wildlife damage control', 
-		);*/
-
+	// @var array $c_settings
+	protected $c_settings;
 	
+	// @var array $c_settings
+	protected $c_services;
 	
-	/*_served = array(
-		'clallam'      => 'Clallam',
-		'clark'        => 'Clark',
-		'cowlitz'      => 'Cowlitz',
-		'grays Harbor' => 'Grays Harbor',
-		'island'       => 'Island',
-		'jefferson '   => 'Jefferson ',
-		'king'         => 'King',
-		'kitsap'       => 'Kitsap',
-		'lewis'    	   => 'Lewis',
-		'mason'        => 'Mason',
-		'pacific'      => 'Pacific',
-		'pierce'       => 'Pierce',
-		'san Juan'     => 'San Juan',
-		'skagit'       => 'Skagit',
-		'skamania'     => 'Skamania',
-		'snohomish'    => 'Snohomish',
-		'thurston'     => 'Thurston',
-		'wahkiakum'    => 'Wahkiakum',
-		'whatcom'      => 'Whatcom',
-		'adams'        => 'Adams',
-		'asotin'       => 'Asotin',
-		'benton'       => 'Benton',
-		'chelan'       => 'Chelan',
-		'columbia'     => 'Columbia',
-		'douglas'      => 'Douglas',
-		'ferry '       => 'Ferry ',
-		'franklin'     => 'Franklin',
-		'garfield'     => 'Garfield',
-		'grant'        => 'Grant',
-		'kittitas'     => 'Kittitas',
-		'klickitat'    => 'Klickitat',
-		'lincoln'      => 'Lincoln',
-		'okanogan'     => 'Okanogan',
-		'pend oreille' => 'Pend Oreille',
-		'spokane'      => 'Spokane',
-		'stevens'      => 'Stevens',
-		'walla walla'  => 'Walla Walla',
-		'whitman'      => 'Whitman',
-		'yakima'       => 'Yakima',
-	);*/
+	// @var array $c_locations
+	protected $c_locations;
 	
 	/**
 	 * Set up object
@@ -168,6 +109,38 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 	 * @return array
 	 */
 	public function get_counties_served(){ return $this->counties_served; }
+	
+	/**
+	 * Get method for c_settings
+	 * @return array
+	 */
+	public function get_c_settings(){ return $this->c_settings; }
+	
+	/**
+	 * Get method for c_services
+	 * @return array
+	 */
+	public function get_c_services(){ return $this->c_services; }
+	
+	/**
+	 * Get method for c_locations
+	 * @return array
+	 */
+	public function get_c_locations(){ return $this->c_locations; }
+	
+	/**
+	 * Set up the consultant
+	 * @param object $post WP Post Object
+	 */
+	public function the_consultant( $post ){
+		
+		$this->c_settings = $this->get_settings( $post->ID );
+		
+		$this->c_services = $this->services->get_terms( $post->ID );
+		
+		$this->c_locations = $this->counties->get_terms( $post->ID );
+		
+	} // end the_consultant
 	
 	/**
 	 * Add edit form after title
@@ -282,7 +255,11 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 			
 			$html .= '<h3 class="consultant-section-title">Services Provided</h3>';
 			
-			foreach( $services->get_values() as $service_key => $service ){
+			$serv = $services->get_values();
+			
+			asort( $serv );
+			
+			foreach( $serv as $service_key => $service ){
 				
 				$html .= '<div class="consultant-field checkbox">';
 				
@@ -326,7 +303,11 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 			
 			$html .= '<h3 class="consultant-section-title">Counties Served</h3>';
 			
-			foreach( $counties->get_values() as $county_key => $county ){
+			$values = $counties->get_values();
+			
+			asort( $values );
+			
+			foreach( $values as $county_key => $county ){
 				
 				$checked = ( in_array( $county_key , $terms ) ) ? ' checked="checked"':'';
 				
@@ -392,12 +373,38 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 			
 			$html .= '<div class="consultant-field radio" >';
 			
-				$html .= '<label>SAF Certified Foresters on Staff</label>';
+				$html .= '<label>Member(s) of the Society of American Foresters (SAF) on staff</label>';
 			
 				$html .= '<div><input id="saf-yes" type="radio" name="_saf" value="1" ' . checked( 1 , $settings['_saf'] , false  ) . '/><label for="saf-yes">Yes</label></div>';
 				
 				$html .= '<div><input id="saf-no" type="radio" name="_saf" value="0" ' . checked( 0 , $settings['_saf'] , false ) . '/><label for="saf-no">No</label></div>';
 			
+			$html .= '</div>';
+
+			$html .= '<div class="consultant-field radio" >';
+			
+				$html .= '<label>Certified Wildfire Mitigation Specialist(s) (CWMS) on staff</label>';
+			
+				$html .= '<div><input id="cwms-yes" type="radio" name="_cwms" value="1" ' . checked( 1 , $settings['_cwms'] , false  ) . '/><label for="cwms-yes">Yes</label></div>';
+				
+				$html .= '<div><input id="cwms-no" type="radio" name="_cwms" value="0" ' . checked( 0 , $settings['_cwms'] , false ) . '/><label for="cwms-no">No</label></div>';
+			
+			$html .= '</div>';
+
+			$html .= '<div class="consultant-field radio" >';
+			
+				$html .= '<label>Are you an NRCS Technical Service Provider (TSP)</label>';
+			
+				$html .= '<div><input id="tsp-yes" type="radio" name="_tsp" value="1" ' . checked( 1 , $settings['_tsp'] , false  ) . '/><label for="tsp-yes">Yes</label></div>';
+				
+				$html .= '<div><input id="tsp-no" type="radio" name="_tsp" value="0" ' . checked( 0 , $settings['_tsp'] , false ) . '/><label for="tsp-no">No</label></div>';
+			
+			$html .= '</div>';
+
+			$html .= '<div class="consultant-field"><label>TSP ID Number</label>';
+			
+				$html .= '<input type="text" name="_tsp_number" value="' . $settings['_tsp_number'] . '" placeholder="TSP number"/>';
+
 			$html .= '</div>';
 			
 		$html .= '</fieldset>';

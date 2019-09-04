@@ -47,14 +47,20 @@
 	padding: 0 0 60px;
 	background: #fff;
 	vertical-align: top;
-	min-height: 160px;
+	min-height: 100px;
 	position: relative;
 	word-wrap: break-word;
+	background-color: #eee;
 }
 
 .directory-card div {
 	margin: 0.5rem 1rem;
 }
+
+.directory-card article {
+	display: none;
+}
+
 
 .directory-meta {
 	display: none;
@@ -82,23 +88,6 @@
 	font-weight: bold;
 }
 
-.directory-profile-contact {
-	width: 30%;
-	display: inline-block;
-	vertical-align: top;
-	padding: 1rem 0;
-}
-
-.directory-profile-contact div {
-	margin: 0 1rem;
-}
-
-.directory-profile-content {
-	width: 70%;
-	display: inline-block;
-	vertical-align: top;
-	padding: 1rem 0 2rem;
-}
 
 #cwpdir-lb {
 	position: absolute;
@@ -125,10 +114,11 @@
 }
 
 #cwpdir-lb section {
-	max-width: 800px;
+	max-width: 900px;
 	margin: 0 auto;
 	background-color: #fff;
 	display: block;
+	position: relative;
 }
 
 #cwpdir-lb-bg {
@@ -140,5 +130,48 @@
 	background-color: rgba( 0 , 0, 0 , 0.5 );
 	z-index: 99998;
 	display: none;
+}
+
+.directory-profile {
+	padding: 1rem 0 2rem;
+}
+
+.directory-profile h3 {
+	border-bottom: 1px solid #ddd;
+	margin-bottom: 0;
+	padding-bottom: 0.5rem;
+}
+
+.directory-profile .directory-profile-sidebar {
+	display: inline-block;
+	width: 30%;
+	vertical-align: top;
+	padding: 1rem 0 0;
+}
+
+.directory-profile .directory-profile-sidebar > div {
+	margin: 0 0.75rem 1rem 1.5rem;
+}
+
+.directory-profile .directory-profile-main {
+	display: inline-block;
+	width: 70%;
+	vertical-align: top;
+	padding: 1rem 0 0;
+}
+
+.directory-profile .directory-profile-main > div {
+	margin: 0 1.5rem 1rem 0.75rem;
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 1rem;
+}
+
+.directory-profile header {
+	margin: 0 1.5rem;
+	color: #981e32;
+}
+
+.directory-profile-email {
+	word-wrap: break-word;
 }
 

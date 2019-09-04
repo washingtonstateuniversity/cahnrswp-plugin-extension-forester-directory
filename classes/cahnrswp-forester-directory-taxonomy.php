@@ -124,6 +124,8 @@ abstract class CAHNRSWP_Forester_Directory_taxonomy {
 		
 		$terms = get_the_terms( $post_id , $this->get_slug() );
 		
+		if ( ! is_array( $terms ) ) $terms = array();
+		
 		if ( $slugs ){
 			
 			$term_slugs = array();

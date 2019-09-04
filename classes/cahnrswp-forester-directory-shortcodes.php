@@ -62,7 +62,7 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 		
 		add_thickbox();
 		
-		$posts = get_posts( array('post_type' => 'consultant' , 'posts_per_page' => -1 ) );
+		$posts = get_posts( array('post_type' => 'consultant' , 'posts_per_page' => -1 , 'orderby'=> 'title', 'order' => 'ASC' ) );
 		
 		$html .= '<div id="cwpdir">';
 		
@@ -72,9 +72,7 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 		
 		foreach( $posts as $post ){
 			
-			$settings = $this->consultant->get_settings( $post->ID );
-			
-			$html .= $this->get_card( $post , $settings );
+			$html .= $this->get_card( $post );
 			
 		} // end foreach
 		
@@ -106,6 +104,8 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 				
 					$values = $this->counties->get_values();
 					
+					asort( $values );
+					
 					foreach( $values as $key => $name ){
 						
 						$html .= '<option value="' . $key . '">' . $name . '</option>';
@@ -125,6 +125,8 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 					$html .= '<option value="none">None</option>';
 				
 					$values = $this->services->get_values();
+					
+					asort( $values );
 					
 					foreach( $values as $key => $name ){
 						
@@ -163,101 +165,27 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 	 * @param array $settings Post settings
 	 * @return string HTML for the card
 	 */
-	private function get_card( $post , $settings ){
+	private function get_card( $post ){
+		
+		$this->consultant->the_consultant( $post );
+		
+		$settings = $this->consultant->get_c_settings();
 		
 		$html = '<div class="directory-card">';
 		
-			$html .= '<div class="directory-title">' . $post->post_title . '</div>';
+			$html .= '<div class="directory-title"><a class="action-show-profile" href="#" data-id="profile-' . $post->ID . '">' . $post->post_title . '</a></div>';
 			
-			$html .= '<div class="directory-phone">' . $settings['_phone'] . '</div>';
+			$html .= '<div class="directory-address">' . $settings['_city'] . ', ' . $settings['_state'] . '</div>';
 			
-			$html .= '<div class="directory-email">' . $settings['_email'] . '</div>';
+			if ( ! empty( $settings['_phone'] ) ) {
+
+			$html .= '<div class="directory-phone">Phone: ' . $settings['_phone'] . '</div>';
+
+			}
 			
-			$html .= '<div class="directory-profile-button"><a href="#" data-id="profile-' . $post->ID . '">View Profile</a></div>';
+			$html .= '<div class="directory-profile-button"><a class="action-show-profile" href="#" data-id="profile-' . $post->ID . '">View Profile</a></div>';
 			
-			$html .= '<div id="profile-' . $post->ID . '"  style="display:none;">';
-		
-			$html .= '<div class="directory-profile-wrap">';
-			
-				$html .= '<div class="directory-profile-contact">';
-				
-					$html .= '<div class="directory-profile-title">' . $post->post_title . '</div>';
-				
-					$html .= '<div class="directory-profile-phone">' . $settings['_phone'] . '</div>';
-					
-					$html .= '<div class="directory-profile-email">' . $settings['_email'] . '</div>';
-					
-					$html .= '<div class="directory-profile-addres">' . $settings['_address'] . '<br>' . $settings['_city'] . ', ' . $settings['_state'] . ', ' . $settings['_zip'] . '</div>';
-				
-				$html .= '</div>';
-				
-				$html .= '<div class="directory-profile-content">';
-				
-					$html .= '<div class="directory-profile-remarks">';
-					
-						$html .= '<h4>Business Description and Remarks</h4>';
-					
-						$html .= apply_filters( 'the_content' , $post->post_content );
-					
-					$html .= '</div>';
-					
-					$html .= '<div class="directory-profile-locations">';
-					
-						$html .= '<h4>Locations</h4>';
-					
-						$terms = $this->counties->get_terms( $post->ID );
-					
-						$county_meta = '';
-						
-						$county_names = array();
-					
-						foreach( $terms as $term ){
-							
-							$county_meta .= $term->slug . ', ';
-							
-							$county_names[] = $term->name;
-							
-						} // end foreach
-						
-						$html .= implode( ', ' , $county_names );
-						
-						$html .= '<span class="directory-meta">' . $county_meta . '<span>';
-					
-					$html .= '</div>';
-					
-					$html .= '<div class="directory-profile-services">';
-					
-						$terms = $this->services->get_terms( $post->ID );
-					
-						$service_meta = '';
-					
-						foreach( $terms as $term ){
-							
-							$service .= $term->slug . ', ';
-						} // end foreach
-						
-						$html .= '<span class="directory-meta">' . $service . '<span>';
-					
-					$html .= '</div>';
-					
-					$html .= '<div class="directory-profile-type">';
-					
-						$type_meta = '';
-					
-						if ( $settings['_service_forestry'] ) $type_meta .= 'service-forestry';
-						
-						if ( $settings['_service_silvicultural'] ) $type_meta = 'service-silvicultural';
-					
-						$html .= '<span class="directory-meta">' . $type_meta . '<span>';
-					
-					$html .= '</div>';
-				
-				$html .= '</div>';
-			
-			$html .= '</div>';
-			
-		
-		$html .= '</div>';
+			$html .= $this->get_profile( $post , $settings );
 		
 		$html .= '</div>';
 		
@@ -267,5 +195,280 @@ class CAHNRSWP_Forester_Directory_Shortcodes {
 		
 	} // end get_card
 	
+	private function get_profile( $post , $settings  ){
+		
+		$html .= '<article id="profile-' . $post->ID . '" class="directory-profile">';
+		
+			$html .= '<header><h3>' . $post->post_title . '</h3></header>';
+		
+			$html .= '<div class="directory-profile-sidebar">';
+				
+				$html .= $this->get_profile_type( $post , $settings );
+				
+				$html .= $this->get_profile_locations( $post , $settings );
+			
+			$html .= '</div>';
+			
+			$html .= '<div class="directory-profile-main">';
+			
+				$html .= $this->get_profile_contact( $post , $settings );
+			
+				$html .= $this->get_profile_remarks( $post , $settings );
+					
+				$html .= $this->get_profile_services( $post , $settings );
+				
+				$html .= $this->get_profile_optional( $post , $settings );
+				
+				if ( $settings['_service_forestry'] ) $html .= $this->get_profile_consulting( $post , $settings );
+				
+				if ( $settings['_service_silvicultural'] ) $html .= $this->get_profile_contractors( $post , $settings );
+			
+			$html .= '</div>';
+		
+		$html .= '</article>';
+		
+		return $html;
+		
+	}
+	
+	private function get_profile_contact( $post , $settings ){
+		
+		$html = '<div class="directory-profile-contact">';
+		
+			$html .= '<h4>Contact Information</h4>';
+			
+			$html .= '<div class="directory-profile-addres">' . $settings['_address'] . '<br>' . $settings['_city'] . ', ' . $settings['_state'] . ', ' . $settings['_zip'] . '</div>';
+		
+			if ( ! empty( $settings['_phone'] ) ) $html .= '<div class="directory-profile-phone"><strong>Phone: </strong>' . $settings['_phone'] . '</div>';
+			
+			if ( ! empty( $settings['_fax'] )) $html .= '<div class="directory-profile-fax"><strong>Fax: </strong>' . $settings['_fax'] . '</div>';
+			
+			if (! empty(  $settings['_email'] )) $html .= '<div class="directory-profile-email"><strong>Email: </strong><a href="mailto:' . $settings['_email'] . '">' . $settings['_email'] . '</a></div>';
+			
+			if ( ! empty( $settings['_website'] )) $html .= '<div class="directory-profile-website"><a target="_blank" href="' . $settings['_website'] . '">' . $settings['_website'] . '</a></div>';
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	}
+	
+	private function get_profile_remarks( $post , $settings ){
+		
+		$html = '<div class="directory-profile-remarks">';
+					
+			$html .= '<h4>Business Description and Remarks</h4>';
+		
+			$html .= apply_filters( 'the_content' , $post->post_content );
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
+	
+	private function get_profile_locations( $post , $settings ){
+		
+		$html = '<div class="directory-profile-locations">';
+					
+			$html .= '<h4>Counties Served</h4>';
+		
+			$terms = $this->counties->get_terms( $post->ID );
+		
+			$county_meta = '';
+			
+			$html .= '<ul class="directory-option-set">';
+		
+			foreach( $terms as $term ){
+				
+				$county_meta .= $term->slug . ', ';
+				
+				$html .= '<li>' . $term->name . '</li>';
+				
+			} // end foreach
+			
+			$html .= '</ul>';
+			
+			$html .= '<span class="directory-meta">' . $county_meta . '<span>';
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
+	
+	private function get_profile_services( $post , $settings ){
+		
+		$html = '<div class="directory-profile-services">';
+		
+			$html .= '<h4>Services</h4>';
+			
+			$terms = $this->services->get_terms( $post->ID  );
+		
+			$service_meta = '';
+			
+			$html .= '<ul class="directory-option-set">';
+		
+			foreach( $terms as $term ){
+				
+				$html .= '<li>' . $term->name . '</li>';
+				
+				$service .= $term->slug . ', ';
+				
+			} // end foreach
+			
+			if ( $settings['_other_services'] ) $html .= '<li>Other Services: ' . $settings['_other_services'] . '</li>';
+			
+			$html .= '</ul>';
+			
+			$html .= '<span class="directory-meta">' . $service . '<span>';
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
+	
+	private function get_profile_type( $post , $settings ){
+		
+		$meta = array();
+		
+		$html = '<div class="directory-profile-type">';
+		
+			$html .= '<h4>Service Type</h4>';
+		
+			$html .= '<ul class="directory-option-set">';
+			
+				if ( $settings['_service_forestry'] ){
+					
+					$meta[] = 'service-forestry';
+					
+					$html .= '<li>Forestry Consultant</li>';
+					
+				} // end if
+				
+				if ( $settings['_service_silvicultural'] ){
+					
+					$meta[] = 'service-silvicultural';
+					
+					$html .= '<li>Silvicultural Contractor</li>';
+					
+				} // end if
+			
+			$html .= '</ul>';
+		
+			$html .= '<span class="directory-meta">' . implode( ',' , $meta ) . '<span>';
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
+	
+	private function get_profile_optional( $post , $settings ){
+		
+		$meta = array();
+		
+		$html = '<div class="directory-profile-optional">';
+		
+			$html .= '<h4>Optional Information</h4>';
+		
+			$html .= '<ul class="directory-option-inline">';
+					
+				$education = ( ! empty( $settings['_education'] ) ) ? $settings['_education'] : 'N/A';
+					
+				$html .= '<li><strong>Experience/Education of Key Personnel: </strong>' . $education . '</li>';
+				
+				$insurance = ( ! empty( $settings['_liablility_insurance'] ) ) ? $settings['_liablility_insurance'] : 'N/A';
+					
+				$html .= '<li><strong>Carries Liability Insurance: </strong>' . $insurance . '</li>';
+				
+				$surety_bond = ( ! empty( $settings['_surety_bond'] ) ) ? $settings['_surety_bond'] : 'N/A';
+					
+				$html .= '<li><strong>Carries Surety Bond: </strong>' . $surety_bond . '</li>';
+				
+				$pesticide_applicators = ( ! empty( $settings['_pesticide_applicators'] ) ) ? $settings['_pesticide_applicators'] : 'N/A';
+					
+				$html .= '<li><strong>Licensed Pesticide Applicators on staff: </strong>' . $pesticide_applicators . '</li>';
+				
+			$html .= '</ul>';	
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	}
+	
+	private function get_profile_consulting( $post , $settings ){
+		
+		$meta = array();
+		
+		$html = '<div class="directory-profile-consulting">';
+		
+			$html .= '<h4>For Consulting Foresters</h4>';
+		
+			$html .= '<ul class="directory-option-inline">';
+					
+				$macf = ( ! empty( $settings['_macf'] ) ) ? 'Yes' : 'No';
+					
+				$html .= '<li><strong>Member of Association of Consulting Foresters: </strong>' . $macf . '</li>';
+				
+				$saf = ( ! empty( $settings['_saf'] ) ) ? 'Yes' : 'No';
+					
+				$html .= '<li><strong>SAF Certified Foresters on Staff: </strong>' . $saf . '</li>';
+
+				if ( '' !== $settings['_tsp'] ) {
+
+					$tsp = ( ! empty( $settings['_tsp'] ) ) ? 'Yes' : 'No';
+
+					$tsp_number = ( ! empty( $settings['_tsp_number'] ) ) ? $settings['_tsp_number'] : '';
+
+					$html .= '<li><strong>NRCS Technical Service Provider (TSP): </strong>' . $tsp . '</li>';
+
+					$html .= '<li><strong>TSP ID Number: </strong>' . $tsp_number . '</li>';
+
+				}
+
+				if ( '' !== $settings['_cwms'] ) {
+
+					$cwms = ( ! empty( $settings['_cwms'] ) ) ? 'Yes' : 'No';
+
+					$html .= '<li><strong>Certified Wildfire Mitigation Specialist(s) (CWMS) on staff: </strong>' . $cwms . '</li>';
+
+				}
+				
+			$html .= '</ul>';	
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
+	
+	private function get_profile_contractors( $post , $settings ){
+		
+		$meta = array();
+		
+		$html = '<div class="directory-profile-contractors">';
+		
+			$html .= '<h4>For silvicultural Contractors</h4>';
+		
+			$html .= '<ul class="directory-option-inline">';
+					
+				$sfl = ( ! empty( $settings['_sfl'] ) ) ? 'Yes' : 'No';
+					
+				$html .= '<li><strong>Registered Washington State Farm Labor Contractor: </strong>' . $sfl . '</li>';
+				
+				$flc = ( ! empty( $settings['_flc'] ) ) ? $settings['_flc'] : 'N/A';
+					
+				$html .= '<li><strong>FLC license number: </strong>' . $flc . '</li>';
+				
+			$html .= '</ul>';	
+		
+		$html .= '</div>';
+		
+		return $html;
+		
+	} 
 	
 } // end CAHNRSWP_Forester_Directory_Shortcodes

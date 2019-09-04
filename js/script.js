@@ -117,7 +117,7 @@ var CAHNRSWP_Dir = {
 			
 			CAHNRSWP_Dir.lightbox.add_lb();
 			
-			jQuery('body').on( 'click' , '.directory-profile-button a' , function( event ){ event.preventDefault(); CAHNRSWP_Dir.lightbox.show( jQuery( this ) ); });
+			jQuery('body').on( 'click' , 'a.action-show-profile' , function( event ){ event.preventDefault(); CAHNRSWP_Dir.lightbox.show( jQuery( this ) ); });
 			
 			jQuery('body').on( 'click' , '.cwpdir-close' , function( event ){ event.preventDefault(); CAHNRSWP_Dir.lightbox.hide(); });
 			
@@ -139,11 +139,11 @@ var CAHNRSWP_Dir = {
 			
 			var id = ic.data('id');
 			
-			var content = jQuery('#' + id ).html();
+			//var content = jQuery('#' + id ).html();
 			
-			jQuery( '#cwpdir-lb .cwpdir-content').html( content );
+			jQuery( '#cwpdir-lb .cwpdir-content').html( jQuery('#' + id ).clone() );
 			
-			CAHNRSWP_Dir.lightbox.bg.fadeIn('fast' , function(){ CAHNRSWP_Dir.lightbox.frame.show(); })
+			CAHNRSWP_Dir.lightbox.bg.fadeIn('fast' , function(){ CAHNRSWP_Dir.lightbox.frame.show(); CAHNRSWP_Dir.lightbox.height( CAHNRSWP_Dir.lightbox.frame ) })
 			
 		},
 		
@@ -154,6 +154,18 @@ var CAHNRSWP_Dir = {
 			CAHNRSWP_Dir.lightbox.frame.find('.cwpdir-content').html();
 			
 			CAHNRSWP_Dir.lightbox.bg.fadeOut('fast');
+			
+		},
+		
+		height: function( form ){
+			
+			win_h = jQuery(window).scrollTop();
+			
+			par_off = form.offsetParent().offset().top;
+			
+			frm_h = ( win_h - par_off ) + 60;
+			
+			form.css('top', frm_h );
 			
 		}
 		
