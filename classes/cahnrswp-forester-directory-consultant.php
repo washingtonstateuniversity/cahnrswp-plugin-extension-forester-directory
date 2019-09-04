@@ -373,7 +373,7 @@ class CAHNRSWP_Forester_Directory_Consultant extends CAHNRSWP_Forester_Directory
 			
 			$html .= '<div class="consultant-field radio" >';
 			
-				$html .= '<label>Member(s) of the Society of American Foresters (SAF) on staff</label>';
+				$html .= '<label>SAF Certified Foresters on Staff</label>';
 			
 				$html .= '<div><input id="saf-yes" type="radio" name="_saf" value="1" ' . checked( 1 , $settings['_saf'] , false  ) . '/><label for="saf-yes">Yes</label></div>';
 				
