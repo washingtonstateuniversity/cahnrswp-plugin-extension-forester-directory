@@ -5,7 +5,7 @@ Plugin URI: http://cahnrs.wsu.edu/communications
 Description: Searchable directory of WA forestery consultants
 Author: cahnrscommunications, Danial Bleile
 Author URI: http://cahnrs.wsu.edu/communications
-Version: 0.0.1
+Version: 1.0.0
 */
 class CAHNRSWP_Forester_Directory {
 	
