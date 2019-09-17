@@ -2,18 +2,14 @@
 
 class Post_Type_Consultant extends Post_Type {
 
-	protected $taxonomy_service;
-	protected $taxonomy_county;
 	protected $factory_service_provider;
 
 	// @var string $slug Post type slug
-	protected $slug = 'consultant';
+	protected $slug = 'new_consultant';
 
 
-	public function __construct( $factory_service_provider, $taxonomy_service, $taxonomy_county ) {
+	public function __construct( $factory_service_provider ) {
 
-		$this->taxonomy_service         = $taxonomy_service;
-		$this->taxonomy_county          = $taxonomy_county;
 		$this->factory_service_provider = $factory_service_provider;
 
 	}
@@ -24,7 +20,7 @@ class Post_Type_Consultant extends Post_Type {
 		// Call add_hooks method in parent class
 		$this->add_hooks();
 
-		add_action( 'add_meta_boxes', array( $this->add_metaboxes ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_metaboxes' ) );
 
 	}
 
@@ -36,10 +32,10 @@ class Post_Type_Consultant extends Post_Type {
 
 	public function register_post_type() {
 
-		$label = array(
+		$labels = array(
 			'name'               => 'Consultant',
 			'singular_name'      => 'Consultant',
-			'menu_name'          => 'Consultants',
+			'menu_name'          => 'Consultants (new)',
 			'name_admin_bar'     => 'Consultant',
 			'add_new'            => 'Add New',
 			'add_new_item'       => 'Add New Consultant',
@@ -63,7 +59,7 @@ class Post_Type_Consultant extends Post_Type {
 			'capability_type'    => 'page',
 			'has_archive'        => true,
 			'hierarchical'       => false,
-			'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt'),
+			'supports'           => array( 'title', 'thumbnail' ),
 		);
 
 		\register_post_type( $this->get_slug(), $post_type_args );
@@ -73,29 +69,10 @@ class Post_Type_Consultant extends Post_Type {
 
 	public function add_metaboxes() {
 
-		add_meta_box( 
-			'consultant_contact_info',
-			'Contact Information',
-			array( $this, 'the_contact_metabox' ),
-			'post'
-		);
+		$service_provider = $this->factory_service_provider->get_provider( 'forestry', true );
+
+		$service_provider->add_metaboxes( $this->get_slug() );
 
 	}
-
-
-	public function the_contact_metabox( $post ) {
-
-		$service_provider = $this->factory_service_provider->get_provider( 'consultant', $post->ID );
-
-		$contact_address = $service_provider->get_address();
-		$contact_phone   = $service_provider->get_phone();
-		$contact_state   = $service_provider->get_state();
-		$contact_fax     = $service_provider->get_fax();
-		$contact_city    = $service_provider->get_city();
-		$contact_email   = $service_provider->get_email();
-		$contact_zip     = $service_provider->get_zip();
-		$contact_website = $service_provider->get_website();
-	}
-
 
 }
